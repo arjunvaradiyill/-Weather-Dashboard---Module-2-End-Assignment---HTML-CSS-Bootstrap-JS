@@ -30,14 +30,32 @@ getLocationBtn.addEventListener('click', function () {
 
 function fetchWeather(city) {
     fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
-        .then(response => response.json())
-        .then(data => updateWeather(data));
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('City not found');
+            }
+            return response.json();
+        })
+        .then(data => updateWeather(data))
+        .catch(error => {
+            alert("Could not retrieve weather information. Please try again.");
+            console.error(error);  // Log error for debugging
+        });
 }
 
 function fetchWeatherByLocation(lat, lon) {
     fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`)
-        .then(response => response.json())
-        .then(data => updateWeather(data));
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Location weather not found');
+            }
+            return response.json();
+        })
+        .then(data => updateWeather(data))
+        .catch(error => {
+            alert("Could not retrieve weather information. Please try again.");
+            console.error(error);  // Log error for debugging
+        });
 }
 
 function updateWeather(data) {
