@@ -1,6 +1,6 @@
 const apiKey = 'befd984de4d3c050671d4eb935e6c660';
 const cityInput = document.getElementById('cityInput');
-const getLocationBtn = document.getElementById('getLocationBtn');
+const searchBtn = document.getElementById('searchBtn');
 const tempValue = document.getElementById('tempValue');
 const weatherDescription = document.getElementById('weatherDescription');
 const locationDisplay = document.getElementById('location');
@@ -11,48 +11,41 @@ const weatherIcon = document.getElementById('weatherIcon');
 const spinner = document.getElementById('spinner');
 const errorDisplay = document.getElementById('error');
 const weatherDisplay = document.getElementById('weatherDisplay');
+const historyList = document.getElementById('historyList');
 
-// Fetch weather based on city
-cityInput.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') {
-        fetchWeather(cityInput.value);
+let searchHistory = [];
+
+// Fetch weather based on city when search button is clicked
+searchBtn.addEventListener('click', function () {
+    const city = cityInput.value;
+    if (city) {
+        fetchWeather(city);
+        updateSearchHistory(city);
     }
 });
 
-// Fetch weather using device location
-getLocationBtn.addEventListener('click', function () {
-    if (navigator.geolocation) {
-        spinner.style.display = "block"; // Show spinner while fetching location
-        navigator.geolocation.getCurrentPosition((position) => {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
-            fetchWeatherByLocation(lat, lon);
-        }, (error) => {
-            // Handle geolocation errors
-            showError(`Geolocation error: ${error.message}`);
-        });
-    } else {
-        showError("Geolocation is not supported by this browser.");
+// Fetch weather when the enter key is pressed in the input field
+cityInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+        const city = cityInput.value;
+        if (city) {
+            fetchWeather(city);
+            updateSearchHistory(city);
+        }
+    }
+});
+
+// Fetch weather when a city from search history is clicked
+historyList.addEventListener('click', function (e) {
+    if (e.target.tagName === 'LI') {
+        const city = e.target.textContent;
+        fetchWeather(city);
     }
 });
 
 function fetchWeather(city) {
     spinner.style.display = "block"; // Show spinner while fetching data
     fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
-        .then(response => response.json())
-        .then(data => {
-            spinner.style.display = "none"; // Hide spinner after fetching data
-            updateWeather(data);
-        })
-        .catch(err => {
-            spinner.style.display = "none"; // Hide spinner on error
-            showError("Could not retrieve weather information. Please try again.");
-        });
-}
-
-function fetchWeatherByLocation(lat, lon) {
-    spinner.style.display = "block"; // Show spinner while fetching data
-    fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`)
         .then(response => response.json())
         .then(data => {
             spinner.style.display = "none"; // Hide spinner after fetching data
@@ -84,3 +77,40 @@ function showError(message) {
         errorDisplay.style.display = "none"; // Hide error message after 3 seconds
     }, 3000);
 }
+
+// Update search history in the list and localStorage
+function updateSearchHistory(city) {
+    if (!searchHistory.includes(city)) {
+        searchHistory.push(city);
+        renderSearchHistory();
+        saveSearchHistory();
+    }
+}
+
+// Render search history in the list
+function renderSearchHistory() {
+    historyList.innerHTML = '';
+    searchHistory.forEach(city => {
+        const li = document.createElement('li');
+        li.classList.add('list-group-item');
+        li.textContent = city;
+        historyList.appendChild(li);
+    });
+}
+
+// Save search history to localStorage
+function saveSearchHistory() {
+    localStorage.setItem('weatherSearchHistory', JSON.stringify(searchHistory));
+}
+
+// Load search history from localStorage on page load
+function loadSearchHistory() {
+    const savedHistory = localStorage.getItem('weatherSearchHistory');
+    if (savedHistory) {
+        searchHistory = JSON.parse(savedHistory);
+        renderSearchHistory();
+    }
+}
+
+// Load search history when the page loads
+window.onload = loadSearchHistory;

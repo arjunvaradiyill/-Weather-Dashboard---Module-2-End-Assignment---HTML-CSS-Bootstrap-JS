@@ -23,3 +23,15 @@ body {
 #tempValue {
     font-size: 3rem;
 }
+
+#searchHistory {
+    margin-top: 20px;
+}
+
+#searchHistory h3 {
+    font-size: 1.5rem;
+}
+
+.list-group-item {
+    cursor: pointer;
+}

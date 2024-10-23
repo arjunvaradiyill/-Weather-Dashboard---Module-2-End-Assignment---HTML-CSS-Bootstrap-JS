@@ -14,7 +14,7 @@
                 <h1 class="text-center">Weather Dashboard</h1>
                 <div class="input-group mb-3">
                     <input type="text" id="cityInput" class="form-control" placeholder="Enter city name">
-                    <button id="getLocationBtn" class="btn btn-primary">Get Device Location</button>
+                    <button id="searchBtn" class="btn btn-primary">Search</button>
                 </div>
                 <div id="spinner" class="text-center" style="display: none;">
                     <div class="spinner-border text-primary" role="status">
@@ -33,6 +33,12 @@
                         <p><strong>Humidity:</strong> <span id="humidity"></span></p>
                         <p><strong>Wind Speed:</strong> <span id="windSpeed"></span></p>
                     </div>
+                </div>
+
+                <!-- Search History Section -->
+                <div id="searchHistory" class="mt-4">
+                    <h3>Search History</h3>
+                    <ul id="historyList" class="list-group"></ul>
                 </div>
             </div>
         </div>
